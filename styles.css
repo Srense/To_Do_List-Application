@@ -1,3 +1,4 @@
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -21,14 +22,12 @@ body {
 }
 
 #bookSticker {
-    background-image: url('books.png');
     top: 20%;
     left: 10%;
     animation-duration: 12s;
 }
 
 #personSticker {
-    background-image: url('person.png');
     top: 50%;
     left: 80%;
     animation-duration: 8s;
@@ -184,4 +183,24 @@ button.burst::after {
 
 .complete-button:hover {
     background: #218838;
+}
+
+@media(max-width:748px)
+{
+    .container{
+        height:auto;
+        width:60vh;
+
+    }
+}
+@media(max-width:500px)
+{
+    .container{
+        height:auto;
+        width:fit-content
+    }
+    button{
+      padding:5px;
+      margin:3px;
+    }
 }
