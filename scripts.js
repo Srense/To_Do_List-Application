@@ -3,12 +3,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
-
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-module.exports = app;
-
 
 const PORT = process.env.PORT || 3000;
 
@@ -37,7 +34,7 @@ app.post('/bfhl', (req, res) => {
           odd_numbers.push(item);
         }
       } else if (/^[A-Za-z]$/.test(item)) {
-        alphabets.push(item);
+        alphabets.push(item.toUpperCase());
       }
     }
   });
@@ -56,6 +53,8 @@ app.post('/bfhl', (req, res) => {
 app.get('/bfhl', (req, res) => {
   res.json({ operation_code: 1 });
 });
+
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
