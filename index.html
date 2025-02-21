@@ -3,42 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFHL App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        input, button {
-            margin: 10px 0;
-            padding: 5px;
-        }
-        #result {
-            white-space: pre-wrap;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-    </style>
+    <title>BFHL API Test</title>
 </head>
 <body>
-    <h1>BFHL App</h1>
-    <input type="text" id="dataInput" placeholder="Enter data (comma-separated)">
-    <button onclick="sendData()">Send Data</button>
-    <button onclick="checkOperation()">Check Operation</button>
+    <h1>BFHL API Test</h1>
+    <form id="dataForm">
+        <label for="dataInput">Enter data (comma-separated):</label>
+        <input type="text" id="dataInput" required>
+        <button type="submit">Submit</button>
+    </form>
     <div id="result"></div>
 
     <script>
-        const API_URL = ''; // Leave empty for relative path
-
-        async function sendData() {
-            const input = document.getElementById('dataInput').value;
-            const data = input.split(',').map(item => item.trim());
+        document.getElementById('dataForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dataInput = document.getElementById('dataInput').value;
+            const data = dataInput.split(',').map(item => item.trim());
 
             try {
-                const response = await fetch(`${API_URL}/bfhl`, {
+                const response = await fetch('https://your-backend-url.com/bfhl', { // Change to actual backend URL
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -47,23 +30,12 @@
                 });
 
                 const result = await response.json();
-                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result').innerHTML = JSON.stringify(result, null, 2);
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('result').textContent = 'An error occurred. Please try again.';
+                document.getElementById('result').innerHTML = 'An error occurred.';
             }
-        }
-
-        async function checkOperation() {
-            try {
-                const response = await fetch(`${API_URL}/bfhl`);
-                const result = await response.json();
-                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('result').textContent = 'An error occurred. Please try again.';
-            }
-        }
+        });
     </script>
 </body>
 </html>
