@@ -1,71 +1,64 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-const path = require('path');
+const ExcelJS = require('exceljs');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
+const PORT = 4000;
+const EXCEL_FILE_PATH = 'tasks.xlsx';
+
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
-app.use(cors({
-    origin: '*' // Allow requests from any origin (update this later for security)
-}));
 
-const PORT = process.env.PORT || 3000;
+// Function to initialize the Excel file if it doesn't exist
+function initializeExcelFile() {
+    if (!fs.existsSync(EXCEL_FILE_PATH)) {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Tasks');
+        worksheet.columns = [
+            { header: 'Username', key: 'username', width: 20 },
+            { header: 'Description', key: 'description', width: 30 },
+            { header: 'Priority', key: 'priority', width: 10 },
+            { header: 'Completed', key: 'completed', width: 10 }
+        ];
+        workbook.xlsx.writeFile(EXCEL_FILE_PATH);
+    }
+}
 
-const USER_ID = 'john_doe_17091999';
-const EMAIL = 'john@xyz.com';
-const ROLL_NUMBER = 'ABCD123';
+// Initialize the Excel file
+initializeExcelFile();
 
-app.post('/bfhl', (req, res) => {
-    const { data } = req.body;
+// POST endpoint to save task
+app.post('/saveTask', async (req, res) => {
+    const { username, description, priority } = req.body;
 
-    if (!data || !Array.isArray(data)) {
-        return res.status(400).json({ is_success: false, message: "Invalid input data" });
+    if (!username || !description || !priority) {
+        return res.status(400).json({ error: 'Invalid input' });
     }
 
-    const odd_numbers = [];
-    const even_numbers = [];
-    const alphabets = [];
+    try {
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.readFile(EXCEL_FILE_PATH);
+        const worksheet = workbook.getWorksheet('Tasks');
 
-    data.forEach(item => {
-        if (typeof item === 'string') {
-            if (/^[0-9]+$/.test(item)) {
-                const num = parseInt(item);
-                if (num % 2 === 0) {
-                    even_numbers.push(item);
-                } else {
-                    odd_numbers.push(item);
-                }
-            } else if (/^[A-Za-z]$/.test(item)) {
-                alphabets.push(item.toUpperCase());
-            }
-        }
-    });
+        worksheet.addRow({
+            username,
+            description,
+            priority,
+            completed: false
+        });
 
-    res.json({
-        is_success: true,
-        user_id: USER_ID,
-        email: EMAIL,
-        roll_number: ROLL_NUMBER,
-        odd_numbers,
-        even_numbers,
-        alphabets
-    });
+        await workbook.xlsx.writeFile(EXCEL_FILE_PATH);
+
+        res.status(200).json({ message: 'Task saved successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save task' });
+    }
 });
 
-app.get('/bfhl', (req, res) => {
-    res.json({ operation_code: 1 });
-});
-
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Start server
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
