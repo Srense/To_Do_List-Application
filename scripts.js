@@ -9,7 +9,7 @@ const PORT = 4000;
 const EXCEL_FILE_PATH = 'tasks.xlsx';
 
 // Serve static files from the 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname)));
 app.use(bodyParser.json());
 
 // Function to initialize the Excel file if it doesn't exist
